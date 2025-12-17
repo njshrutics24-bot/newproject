@@ -1,0 +1,326 @@
+/* ==============================
+   BOOKIFY — Student Dashboard Theme
+   Antique Leather + Parchment + Gold
+   ============================== */
+
+:root{
+  --leather1:#3b2f27;   /* deep antique brown */
+  --leather2:#2a221d;   /* darker base */
+  --gold:#d6b25e;
+  --gold-soft:#f0d889;
+  --paper:#231e1a;      /* dark parchment base */
+  --text:#f6f6f6;
+  --muted:#c9c9cf;
+  --danger:#ff6b6b;
+  --shadow: 0 20px 50px rgba(0,0,0,.55);
+  --sidebar-w: 260px;   /* parchment sidebar width */
+  --radius: 18px;
+  --gap: 18px;
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family:"Nunito", system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Arial, "Helvetica Neue", sans-serif;
+  color:var(--text);
+  /* Antique leather background + vignette */
+  background:
+    radial-gradient(70% 100% at 50% -20%, rgba(58,45,37,0.8) 0%, transparent 60%),
+    radial-gradient(70% 100% at 110% 120%, rgba(43,34,29,0.85) 0%, transparent 60%),
+    linear-gradient(180deg, var(--leather1), var(--leather2));
+  background-attachment: fixed;
+  position:relative;
+}
+body::before{
+  content:"";
+  position:fixed; inset:0;
+  background: radial-gradient(circle at center, transparent 60%, rgba(0,0,0,0.55) 100%);
+  pointer-events:none;
+  z-index:0;
+}
+
+
+
+.layout{
+  display:grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  min-height:100dvh;
+  position:relative;
+  z-index:1;
+}
+
+/* Sidebar (Parchment) */
+.sidebar{
+  position:sticky; top:0;
+  height:100dvh;
+  padding: 20px 16px;
+  background:
+    linear-gradient(180deg, rgba(35,31,26,.92), rgba(32,27,23,.92)),
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,0.035) 0px,
+      rgba(255,255,255,0.035) 1px,
+      rgba(255,255,255,0.02) 2px,
+      rgba(255,255,255,0.02) 3px
+    );
+  border-right: 1px solid rgba(214,178,94,0.18);
+  box-shadow: inset -1px 0 0 rgba(0,0,0,.2);
+}
+.dash-logo {
+  width: 150px;  /* adjust width */
+  height: auto;
+  display: block;
+  margin: 0 auto 8px;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); /* optional aesthetic */
+}
+
+
+.brand{
+  display:flex; align-items:center; gap:10px;
+  margin-bottom: 14px;
+}
+.brand-mark{
+  width:36px; height:36px; border-radius:10px;
+  display:grid; place-items:center;
+  background: linear-gradient(135deg, var(--gold), var(--gold-soft));
+  color:#1a1a1a; font-weight:900;
+  box-shadow: 0 8px 20px rgba(214,178,94,.3);
+}
+.brand-text{
+  font-weight:900; letter-spacing:.6px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-soft));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+
+/* Sidebar menu + gold dividers */
+.menu{
+  display:flex; flex-direction:column; gap:8px;
+  margin-top: 8px;
+}
+.menu-item{
+  width:100%;
+  text-align:left;
+  padding: 12px 12px;
+  border-radius: 10px;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  text-decoration:none;
+  font-weight:800;
+  cursor:pointer;
+  display:flex; align-items:center; justify-content:space-between;
+  transition: background .2s, transform .05s, color .2s;
+}
+.menu-item:hover{ background: rgba(255,255,255,.05); }
+.menu-item.danger{ color:#ffb2b2; }
+.menu-item.danger:hover{ background: rgba(255,0,0,.12); }
+.divider{
+  height:1px;
+  background: linear-gradient(90deg, transparent, rgba(214,178,94,.5), transparent);
+  margin: 2px 0;
+  opacity:.7;
+}
+.caret{ opacity:.8; }
+
+/* Collapsible panel (sliding) */
+.collapse-panel{
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height .35s ease;
+  border-left: 1px dashed rgba(214,178,94,.25);
+  margin-left: 6px;
+  padding-left: 10px;
+}
+.collapse-panel.open{
+  max-height: 400px; /* enough for options + book list */
+}
+
+.option-list{
+  display:flex; flex-wrap: wrap; gap:8px;
+  margin: 8px 0 6px;
+}
+.opt{
+  padding: 8px 10px;
+  border-radius: 10px;
+  border:1px solid rgba(214,178,94,.3);
+  background:#262018; color: var(--gold-soft);
+  cursor:pointer; font-weight:800;
+  transition: background .2s, transform .05s, color .2s, box-shadow .2s;
+}
+.opt:hover{
+  color:#121212; background: linear-gradient(135deg, var(--gold), var(--gold-soft));
+  box-shadow: 0 0 12px rgba(214,178,94,.5);
+}
+
+/* Books list shown inside panel */
+.book-list{
+  list-style:none; padding: 4px 0 10px; margin:0;
+}
+.book-item{
+  padding: 6px 0 6px 2px;
+  border-bottom: 1px dashed rgba(255,255,255,.12);
+}
+.book-item:last-child{ border-bottom:none; }
+.book-item a{
+  color:#ffffff; text-decoration:none; font-weight:800;
+}
+.book-item a:hover{ text-decoration: underline; }
+
+/* Main content */
+.main{
+  padding: 24px;
+  display:flex;
+  flex-direction:column;
+  gap: var(--gap);
+}
+
+/* Panels (Parchment cards) */
+.panel{
+  background:
+    linear-gradient(180deg, rgba(25,22,20,0.86), rgba(20,17,15,0.86)),
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,0.035) 0px,
+      rgba(255,255,255,0.035) 1px,
+      rgba(255,255,255,0.02) 2px,
+      rgba(255,255,255,0.02) 3px
+    );
+  border: 1px solid rgba(214,178,94,0.16);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(6px);
+}
+
+/* Welcome (two lines) */
+.welcome .quote-top{
+  margin:0 0 4px 0;
+  font-weight:900; letter-spacing:.8px;
+  text-align:right;
+  background: linear-gradient(90deg, var(--gold), var(--gold-soft));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.welcome .quote-sub{
+  margin:0;
+  font-weight:800; letter-spacing:.4px;
+  text-align:right; color:#e7e1cf; opacity:.9;
+}
+
+/* Search */
+.search .search-row{
+  display:flex; gap:10px; align-items:center;
+}
+.search input{
+  flex:1;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border:1px solid rgba(255,255,255,.12);
+  background:#1a1816; color:var(--text);
+  outline:none;
+}
+.search input:focus{
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(214,178,94,.18);
+}
+.hint{ color:var(--muted); display:block; margin-top:8px; }
+
+/* Buttons */
+.btn{
+  padding: 12px 16px;
+  border-radius: 12px;
+  border:1px solid rgba(255,255,255,.12);
+  font-weight:900; letter-spacing:.3px;
+  cursor:pointer; transition: all .25s ease;
+}
+.btn.primary{
+  background: linear-gradient(135deg, var(--gold), var(--gold-soft));
+  color:#191919; border-color: transparent;
+  box-shadow: 0 10px 30px rgba(214,178,94,.25);
+}
+.btn.primary:hover{
+  box-shadow: 0 0 20px rgba(214,178,94,.75), 0 0 10px rgba(214,178,94,.45);
+  transform: translateY(-1px) scale(1.02);
+}
+
+/* Announcements (view-only) */
+.announcements .panel-header{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  margin-bottom: 10px;
+}
+.announcements h2{ margin:0; font-weight:900; letter-spacing:.4px; }
+
+.announce-list{
+  list-style:none; padding:0; margin:0;
+  display:flex; flex-direction:column; gap:10px;
+}
+.announce{
+  display:flex; gap:10px; align-items:center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border:1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.02);
+}
+.announce .emoji{ font-size:18px; }
+
+/* Footer */
+.site-footer{
+  margin-top: auto;
+  padding: 10px 16px; text-align:center;
+  font-weight:800; color: #e7e1cf;
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,.25));
+  border: 1px solid rgba(214,178,94,0.12);
+  border-radius: var(--radius);
+
+}
+
+/* Responsive */
+@media (max-width: 980px){
+  :root{ --sidebar-w: 220px; }
+  .welcome .quote-top, .welcome .quote-sub{ text-align:center; }
+}
+@media (max-width: 680px){
+  .layout{ grid-template-columns: 1fr; }
+  .sidebar{
+    position: relative;
+    height:auto;
+    border-right: none;
+    border-bottom: 1px solid rgba(214,178,94,0.18);
+  }
+  .main{ padding: 16px; }
+  .welcome .quote-top, .welcome .quote-sub{ text-align:center; }
+}
+/* ---------- Force-center welcome quote (place at end of CSS) ---------- */
+.panel.welcome {
+  /* ensure this panel centers its children */
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center !important;
+  gap: 6px;
+  padding-top: 26px; /* optional: give a little breathing room from top */
+  padding-bottom: 18px;
+}
+
+/* make sure the individual lines don't reintroduce right-align */
+.panel.welcome .quote-top,
+.panel.welcome .quote-sub {
+  text-align: center !important;
+  margin: 0 !important;
+}
+
+/* preserve the gold gradient text styling while centered */
+.panel.welcome .quote-top {
+  background: linear-gradient(90deg, var(--gold), var(--gold-soft));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 900;
+}
+
+/* adjust size/spacing if needed */
+.panel.welcome .quote-top { font-size: 1.4rem; }
+.panel.welcome .quote-sub { font-size: 1rem; opacity: .95; }
+
+

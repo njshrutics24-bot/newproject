@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard | E-Library Management</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+
+  <!-- Chart.js + Plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      color: #f5f5f5;
+      background: radial-gradient(circle at top left, #0d0d0d, #1a1a1a 50%, #0d0d0d);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 250px;
+      background: #111;
+      border-right: 2px solid #d4af37;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+      box-shadow: 2px 0 10px rgba(212, 175, 55, 0.2);
+    }
+
+    .sidebar button {
+      background: linear-gradient(90deg, #d4af37, #f5d76e);
+      color: #111;
+      border: none;
+      border-radius: 8px;
+      padding: 0.8rem 1.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      width: 100%;
+      margin: 0.5rem 0;
+    }
+
+    .sidebar button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+    }
+
+    /* MAIN */
+    .main {
+      margin-left: 250px;
+      flex: 1;
+      padding: 3rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-y: auto;
+    }
+
+    .main h1 {
+      color: #f5d76e;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .chart-container {
+      background: rgba(26, 26, 26, 0.9);
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+      padding: 2rem;
+      text-align: center;
+      width: 60%;
+      max-width: 700px;
+    }
+
+    /* SECTIONS */
+    .section {
+      display: none;
+      background: #1a1a1a;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+      margin-top: 2rem;
+      padding: 2rem;
+      width: 60%;
+      max-width: 700px;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section h3 {
+      color: #f5d76e;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .section input, .section select, .section textarea {
+      width: 100%;
+      margin: 0.5rem 0;
+      padding: 0.7rem;
+      border: none;
+      border-radius: 8px;
+      background: #262626;
+      color: #fff;
+    }
+
+    .section button {
+      margin-top: 1rem;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #d4af37, #f5d76e);
+      color: #111;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .section button:hover {
+      transform: scale(1.05);
+    }
+
+    /* TOAST */
+    .toast {
+      visibility: hidden;
+      min-width: 250px;
+      background-color: #111;
+      color: #f5d76e;
+      text-align: center;
+      border-radius: 8px;
+      padding: 1rem;
+      position: fixed;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%);
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+      z-index: 200;
+      transition: visibility 0s, opacity 0.5s ease;
+      opacity: 0;
+    }
+
+    .toast.show {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      background: linear-gradient(180deg, #0d0d0d, #1a1a1a);
+      padding: 1.5rem 1rem;
+      border-top: 1px solid #2e2e2e;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .footer-title { color: #f5d76e; font-weight: 700; margin: 0; }
+    .footer-tagline { color: #f5f5f5; margin: 0.3rem 0 1rem; }
+    .footer-links a { color: #a88f32; text-decoration: none; margin: 0 0.3rem; }
+    .footer-links a:hover { color: #f5d76e; text-decoration: underline; }
+    .footer-copy { color: #aaa; font-size: 0.8rem; margin-top: 0.8rem; }
+  </style>
+</head>
+
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <button id="addBookBtn">Add Book</button>
+    <button id="deleteBookBtn">Delete Book</button>
+    <button id="announceBtn">Make Announcements</button>
+    <button id="trackBtn">Track Student Journey</button>
+    <button id="logoutBtn">Logout</button>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <h1>📊 Library Statistics</h1>
+    <div class="chart-container">
+      <canvas id="adminPieChart"></canvas>
+    </div>
+
+    <!-- ADD BOOK -->
+    <div class="section" id="addBookSection">
+      <h3>Add a New Book</h3>
+      <input type="text" placeholder="Book Title">
+      <input type="text" placeholder="Author">
+      <input type="text" placeholder="Category">
+      <input type="text" placeholder="ISBN">
+      <button onclick="showToast('✅ Book Added Successfully!')">Add Book</button>
+    </div>
+
+    <!-- DELETE BOOK -->
+    <div class="section" id="deleteBookSection">
+      <h3>Delete a Book</h3>
+      <select>
+        <option value="">-- Select Book --</option>
+        <option>The Great Gatsby</option>
+        <option>1984</option>
+        <option>To Kill a Mockingbird</option>
+        <option>Pride and Prejudice</option>
+      </select>
+      <button onclick="showToast('🗑 Book Deleted Successfully!')">Delete</button>
+    </div>
+
+    <!-- ANNOUNCEMENTS -->
+    <div class="section" id="announceSection">
+      <h3>Make Announcement</h3>
+      <textarea rows="4" placeholder="Type your announcement here..."></textarea>
+      <button onclick="showToast('📢 Announcement Sent!')">Post Announcement</button>
+    </div>
+
+    <!-- TRACK STUDENT -->
+    <div class="section" id="trackSection">
+      <h3>Track Student Journey</h3>
+      <input type="text" placeholder="Enter Student ID">
+      <button onclick="showToast('🎓 Student record found!')">Track</button>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toastBox"></div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-container">
+      <h3 class="footer-title">BOOKIFY</h3>
+      <p class="footer-tagline">Inspiring Lifelong Learning • Discover, Read, Grow</p>
+      <div class="footer-links">
+        <a href="#">Profile</a> •
+        <a href="#">Library Help</a> •
+        <a href="#">Terms & Privacy</a>
+      </div>
+      <p class="footer-copy">© 2025 BOOKIFY. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPT -->
+  <script>
+    // PIE CHART
+    const ctx = document.getElementById('adminPieChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['Books Available', 'Books Issued', 'Overdue'],
+        datasets: [{
+          data: [120, 45, 15],
+          backgroundColor: ['#f5d76e', '#d4af37', '#b8991a'],
+          borderColor: '#0d0d0d',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        plugins: {
+          legend: {
+            labels: { color: '#f5f5f5', font: { size: 14 } },
+            position: 'bottom'
+          },
+          datalabels: {
+            color: '#111',
+            font: { weight: 'bold', size: 14 },
+            formatter: (value, ctx) => {
+              let label = ctx.chart.data.labels[ctx.dataIndex];
+              return label + '\\n(' + value + ')';
+            }
+          }
+        }
+      },
+      plugins: [ChartDataLabels]
+    });
+
+    // Sections logic
+    const sections = {
+      addBookBtn: 'addBookSection',
+      deleteBookBtn: 'deleteBookSection',
+      announceBtn: 'announceSection',
+      trackBtn: 'trackSection'
+    };
+
+    Object.keys(sections).forEach(btnId => {
+      document.getElementById(btnId).addEventListener('click', () => {
+        Object.values(sections).forEach(id => document.getElementById(id).style.display = 'none');
+        document.getElementById(sections[btnId]).style.display = 'block';
+      });
+    });
+
+    // Toast + Logout
+    const toast = document.getElementById('toastBox');
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+  showToast('🚪 You are logged out successfully!');
+  setTimeout(() => {
+    window.location.href = "index.html";   // 🔥 redirect to login
+  }, 1500);
+});
+
+    
+    
+  </script>
+</body>
+</html>

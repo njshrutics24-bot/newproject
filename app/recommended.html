@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recommendations | E-Library</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #000000;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    header {
+      padding: 30px 0 10px;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #ffd700;
+    }
+
+    .quote {
+      font-size: 0.95rem;
+      color: #ccc;
+      margin-bottom: 30px;
+      font-style: italic;
+    }
+
+    .recommend-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
+      padding: 40px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .book-card {
+      background-color: #13132b;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .book-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+    }
+
+    .book-cover {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .book-title {
+      color: #ffd700;
+      font-weight: 600;
+      font-size: 1.2rem;
+      margin: 15px 0 5px;
+    }
+
+    .book-author {
+      color: #aaa;
+      font-size: 0.9rem;
+    }
+
+    .book-desc {
+      color: #ccc;
+      font-size: 0.85rem;
+      margin: 10px 0;
+    }
+
+    .add-btn {
+      background: #ffd700;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .add-btn:hover {
+      background: #ffcc00;
+    }
+  </style>
+</head>
+<body>
+  <header>✨ Recommended Reads</header>
+  <p class="quote">"A reader lives a thousand lives before he dies." — George R.R. Martin</p>
+
+  <section class="recommend-container">
+    <div class="book-card" data-title="The Great Gatsby" data-author="F. Scott Fitzgerald" data-image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR62JwSE1PMJ6JOSBGUsCGpklLeoTrewXgePg&s">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR62JwSE1PMJ6JOSBGUsCGpklLeoTrewXgePg&s" class="book-cover" />
+      <div class="book-title">The Great Gatsby</div>
+      <div class="book-author">by F. Scott Fitzgerald</div>
+      <p class="book-desc">A timeless story of love, ambition, and the illusion of the American Dream.</p>
+      <button class="add-btn">Add to Wishlist</button>
+    </div>
+
+    <div class="book-card" data-title="Atomic Habits" data-author="James Clear" data-image="https://jamesclear.com/wp-content/uploads/2021/08/atomic-habits-dots-1.png">
+      <img src="https://jamesclear.com/wp-content/uploads/2021/08/atomic-habits-dots-1.png" class="book-cover" />
+      <div class="book-title">Atomic Habits</div>
+      <div class="book-author">by James Clear</div>
+      <p class="book-desc">Small changes, remarkable results — a guide to building better habits.</p>
+      <button class="add-btn">Add to Wishlist</button>
+    </div>
+
+    <div class="book-card" data-title="Clean Code" data-author="Robert C. Martin" data-image="https://www.oreilly.com/library/cover/9780136083238/1200w630h/">
+      <img src="https://www.oreilly.com/library/cover/9780136083238/1200w630h/" class="book-cover" />
+      <div class="book-title">Clean Code</div>
+      <div class="book-author">by Robert C. Martin</div>
+      <p class="book-desc">A must-read for developers to write clean, maintainable code.</p>
+      <button class="add-btn">Add to Wishlist</button>
+    </div>
+  </section>
+
+  <script>
+  const addButtons = document.querySelectorAll(".add-btn");
+
+  addButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      const card = button.closest(".book-card");
+      const book = {
+        title: card.dataset.title,
+        author: card.dataset.author,
+        image: card.dataset.image
+      };
+
+      let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+
+      // Add only if not already added
+      if (!wishlist.some(item => item.title === book.title)) {
+        wishlist.push(book);
+        localStorage.setItem("wishlist", JSON.stringify(wishlist));
+      }
+
+      // 👉 Immediately redirect to wishlist page
+      window.location.href = "wishlist.html";
+    });
+  });
+</script>
+</body>
+</html>

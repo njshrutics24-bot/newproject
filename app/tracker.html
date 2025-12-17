@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Tracker | E-Library Management</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      color: #f5f5f5;
+      background: radial-gradient(circle at top left, #0d0d0d, #1a1a1a 50%, #0d0d0d);
+      background-attachment: fixed;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* HEADER */
+    .header {
+      text-align: center;
+      padding: 2rem 1rem 1rem;
+    }
+    .header h1 {
+      color: #f5d76e;
+      margin: 0;
+      font-size: 2rem;
+    }
+    .header .quote {
+      color: #cfcfcf;
+      font-size: 0.95rem;
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+
+    /* DASHBOARD */
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      padding: 2rem 3rem;
+    }
+
+    /* CARD STYLE */
+    .card {
+      background: rgba(26, 26, 26, 0.95);
+      padding: 1.8rem 2rem;
+      border-radius: 16px;
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
+      transition: transform 0.3s, box-shadow 0.3s;
+      text-align: center;
+    }
+    .card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    }
+    .card h2 {
+      color: #f5d76e;
+      margin-bottom: 1rem;
+    }
+    .card p {
+      color: #ccc;
+      margin-bottom: 1.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      background: #111;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 0.8rem;
+      text-align: center;
+    }
+    th {
+      background: #d4af37;
+      color: #111;
+    }
+    tr:nth-child(even) {
+      background: #1f1f1f;
+    }
+    tr:nth-child(odd) {
+      background: #151515;
+    }
+
+    /* BUTTONS */
+    button {
+      margin-top: 1.2rem;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #d4af37, #f5d76e);
+      color: #111;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    /* BOOKIFY FOOTER */
+    footer {
+      text-align: center;
+      background: linear-gradient(180deg, #0d0d0d, #1a1a1a);
+      padding: 1.5rem 1rem;
+      border-top: 1px solid #2e2e2e;
+      box-shadow: 0 -2px 10px rgba(212, 175, 55, 0.1);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .footer-container {
+      max-width: 700px;
+      margin: 0 auto;
+      color: #d4af37;
+    }
+
+    .footer-title {
+      margin: 0;
+      font-weight: 700;
+      color: #f5d76e;
+      font-size: 1.2rem;
+    }
+
+    .footer-tagline {
+      font-size: 0.9rem;
+      color: #f5f5f5;
+      margin: 0.3rem 0 1rem;
+    }
+
+    .footer-links a {
+      color: #a88f32;
+      text-decoration: none;
+      font-size: 0.9rem;
+      margin: 0 0.3rem;
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover {
+      color: #f5d76e;
+      text-decoration: underline;
+    }
+
+    .footer-copy {
+      margin-top: 0.8rem;
+      font-size: 0.8rem;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>📘 Student Journey Tracker</h1>
+    <p class="quote">"Every page turned is a step forward in knowledge."</p>
+  </header>
+
+  <main class="dashboard">
+    <!-- Books Borrowed -->
+    <section class="card">
+      <h2>📚 Books Borrowed</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Book Title</th>
+            <th>Author</th>
+            <th>Date Borrowed</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>The Great Gatsby</td>
+            <td>F. Scott Fitzgerald</td>
+            <td>Oct 10, 2025</td>
+          </tr>
+          <tr>
+            <td>1984</td>
+            <td>George Orwell</td>
+            <td>Oct 05, 2025</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Due Date -->
+    <section class="card">
+      <h2>⏰ Due Dates</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Book Title</th>
+            <th>Due Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>The Great Gatsby</td>
+            <td>Oct 20, 2025</td>
+            <td>On Time</td>
+          </tr>
+          <tr>
+            <td>1984</td>
+            <td>Oct 14, 2025</td>
+            <td style="color: #ff5555;">Overdue</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Fine / Penalty -->
+    <section class="card">
+      <h2>💰 Fine / Penalty</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Book Title</th>
+            <th>Days Late</th>
+            <th>Fine</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1984</td>
+            <td>3</td>
+            <td>₹15</td>
+          </tr>
+        </tbody>
+      </table>
+      <button>Pay Fine</button>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-container">
+      <h3 class="footer-title">BOOKIFY</h3>
+      <p class="footer-tagline">Inspiring Lifelong Learning • Discover, Read, Grow</p>
+      <div class="footer-links">
+        <a href="#">Profile</a> •
+        <a href="#">Library Help</a> •
+        <a href="#">Terms & Privacy</a>
+      </div>
+      <p class="footer-copy">© 2025 BOOKIFY. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>

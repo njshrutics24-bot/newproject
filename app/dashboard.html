@@ -1,0 +1,239 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bookify — Student Dashboard</title>
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+
+<body>
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+  <img src="images/logo.png" alt="Bookify Logo" class="dash-logo">
+  <div class="brand-text">BOOKIFY</div>
+</div>
+
+
+      <nav class="menu">
+
+        <!-- Department Dropdown -->
+        <button class="menu-item collapsible" data-target="#deptPanel">
+          <span>Department</span><span class="caret">▸</span>
+        </button>
+        <div id="deptPanel" class="collapse-panel">
+          <div class="option-list">
+            <button class="opt" data-dept="CSE">CSE</button>
+            <button class="opt" data-dept="AIML">AIML</button>
+            <button class="opt" data-dept="ISE">ISE</button>
+            <button class="opt" data-dept="ECE">ECE</button>
+            <button class="opt" data-dept="EEE">EEE</button>
+            <button class="opt" data-dept="ME">ME</button>
+            <button class="opt" data-dept="CE">CE</button>
+          </div>
+          <ul id="deptBooks" class="book-list"></ul>
+        </div>
+
+        <span class="divider"></span>
+
+        <!-- Genre Dropdown -->
+        <button class="menu-item collapsible" data-target="#genrePanel">
+          <span>Genre</span><span class="caret">▸</span>
+        </button>
+        <div id="genrePanel" class="collapse-panel">
+          <div class="option-list">
+            <button class="opt" data-genre="Fiction">Fiction</button>
+            <button class="opt" data-genre="Mathematics">Mathematics</button>
+            <button class="opt" data-genre="Chemistry">Chemistry</button>
+            <button class="opt" data-genre="Newspaper">Newspaper</button>
+            <button class="opt" data-genre="DSA">DSA</button>
+          </div>
+          <ul id="genreBooks" class="book-list"></ul>
+        </div>
+
+        <span class="divider"></span>
+
+        <a href="profile.html" class="menu-item">Profile</a>
+        <span class="divider"></span>
+        <a href="#" class="menu-item danger" id="logoutBtn">Logout</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+
+      <!-- Welcome Section -->
+      <section class="panel welcome">
+        <h1 class="quote-top">WELCOME TO BOOKIFY</h1>
+        <h2 class="quote-sub">YOUR GATEWAY TO LEARNING</h2>
+      </section>
+
+      <!-- Search Section -->
+      <section class="panel search">
+        <div class="search-row">
+          <input id="searchInput" type="text" placeholder="Search book names…" />
+          <button class="btn primary" id="searchBtn" type="button">Search</button>
+        </div>
+        <small class="hint">Tip: Search titles only</small>
+      </section>
+
+      <!-- Announcements Section (View Only) -->
+      <section class="panel announcements">
+        <div class="panel-header">
+          <h2>📢 Announcements</h2>
+        </div>
+        <ul class="announce-list">
+          <li class="announce"><span class="emoji">📢</span> Library cards will be distributed from tomorrow</li>
+          <li class="announce"><span class="emoji">📢</span> Library will be open on Sundays till 10 PM</li>
+        </ul>
+      </section>
+
+      <!-- Footer -->
+      <footer class="site-footer">
+        © <span id="year"></span> BOOKIFY • Inspiring Lifelong Learning
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- ==========================
+       INTERNAL JAVASCRIPT BELOW
+       ========================== -->
+  <script>
+    // Dynamic year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // -----------------------------
+    // Book Data (Department & Genre)
+    // -----------------------------
+    
+    // -----------------------------
+    // Collapsible (Sliding Panels)
+    // -----------------------------
+    document.querySelectorAll('.collapsible').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetSel = btn.getAttribute('data-target');
+        const panel = document.querySelector(targetSel);
+        const caret = btn.querySelector('.caret');
+        if (!panel) return;
+        const isOpen = panel.classList.contains('open');
+        panel.classList.toggle('open', !isOpen);
+        caret.textContent = !isOpen ? '▾' : '▸';
+      });
+    });
+
+    // -----------------------------
+    // Render Book List with Loading
+    // -----------------------------
+    const deptBooksEl = document.getElementById('deptBooks');
+    const genreBooksEl = document.getElementById('genreBooks');
+
+    function renderList(ulEl, items) {
+      ulEl.innerHTML = "";
+      if (!items || !items.length) {
+        const li = document.createElement('li');
+        li.className = 'book-empty';
+        li.textContent = "No books available.";
+        ulEl.appendChild(li);
+        return;
+      }
+
+      // Loading effect
+      const loading = document.createElement('li');
+      loading.className = 'book-empty';
+      loading.textContent = "Loading books...";
+      ulEl.appendChild(loading);
+
+      setTimeout(() => {
+        ulEl.innerHTML = "";
+        items.forEach(title => {
+          const li = document.createElement('li');
+          li.className = 'book-item';
+          const a = document.createElement('a');
+          a.href = "#"; // Future redirect to book page
+          a.textContent = title;
+          li.appendChild(a);
+          ulEl.appendChild(li);
+        });
+      }, 800);
+    }
+
+    // Department Selection
+   // Department Selection (fetch from backend)
+document.querySelectorAll('#deptPanel .opt').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const key = btn.getAttribute('data-dept');
+
+    // show temporary loading
+    renderList(deptBooksEl, ["Loading..."]);
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/books/department/${encodeURIComponent(key)}`);
+      const titles = await res.json();   // ["Introduction to Algorithms", ...]
+      renderList(deptBooksEl, titles);
+    } catch (err) {
+      console.error(err);
+      renderList(deptBooksEl, []);       // will show "No books available."
+    }
+  });
+});
+5
+
+    // Genre Selection
+    // Genre Selection (fetch from backend)
+document.querySelectorAll('#genrePanel .opt').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const key = btn.getAttribute('data-genre');
+
+    renderList(genreBooksEl, ["Loading..."]);
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/books/genre/${encodeURIComponent(key)}`);
+      const titles = await res.json();
+      renderList(genreBooksEl, titles);
+    } catch (err) {
+      console.error(err);
+      renderList(genreBooksEl, []);
+    }
+  });
+});
+
+
+
+    // -----------------------------
+    // Search Functionality
+    // -----------------------------
+    document.getElementById('searchBtn').addEventListener('click', () => {
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      if (!q) return alert("Type a book title to search.");
+      const all = [
+        ...Object.values(BOOKS_BY_DEPT).flat(),
+        ...Object.values(BOOKS_BY_GENRE).flat()
+      ];
+      const matches = [...new Set(all)].filter(t => t.toLowerCase().includes(q));
+      if (!matches.length) return alert(`No matches for "${q}".`);
+      alert(`Matches:\n- ${matches.join("\n- ")}`);
+    });
+
+    // -----------------------------
+    // Logout with Confirmation
+    // -----------------------------
+    document.getElementById('logoutBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      const confirmed = confirm("Are you sure you want to logout?");
+      if (confirmed) {
+        window.location.href = "index.html";
+      }
+    });
+  </script>
+
+</body>
+</html>
