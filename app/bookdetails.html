@@ -17,26 +17,32 @@
     <div class="book-hero">
       <!-- Book Covers Side by Side -->
       <div class="cover">
-        <img src="https://m.media-amazon.com/images/I/81F90H7hnML.jpg" alt="Front Cover" class="book-side">
-        <img src="https://5.imimg.com/data5/SELLER/Default/2022/10/HK/FN/FC/162021231/atomic-habits-500x500.jpg" alt="Back Cover" class="book-side">
+        <img id="frontCover" alt="Front Cover" class="book-side">
+<img id="backCover"  alt="Back Cover"  class="book-side">
+
       </div>
 
       <div class="info-card">
-        <h1>📘 Atomic Habits</h1>
-        <p><strong>Author:</strong> James Clear</p>
-        <p><strong>Genre:</strong> 
-          <span class="tag">Self-help</span> 
-          <span class="tag">Productivity</span>
-        </p>
-        <p><strong>Rating:</strong> ⭐ 4.8/5</p>
+  <h1 id="bookTitle">📘 Loading...</h1>
 
-        <div class="actions">
-          <button onclick="location.href='wishlist.html'">📌 Add to Wishlist</button>
-        </div>
+  <p><strong>Author:</strong> <span id="bookAuthor">—</span></p>
 
-        <label for="note"><strong>📝 Your Notes:</strong></label>
-        <textarea id="note" placeholder="Write your thoughts here..."></textarea>
-      </div>
+  <p><strong>Genre:</strong>
+    <span class="tag" id="bookGenre">—</span>
+  </p>
+
+  <p><strong>Department:</strong> <span id="bookDepartment">—</span></p>
+  <p><strong>Language:</strong> <span id="bookLanguage">—</span></p>
+  <p><strong>Pages:</strong> <span id="bookPages">—</span></p>
+  <p><strong>Price:</strong> ₹<span id="bookPrice">—</span></p>
+
+  <div class="actions">
+    <button onclick="location.href='wishlist.html'">📌 Add to Wishlist</button>
+  </div>
+
+  <label for="note"><strong>📝 Your Notes:</strong></label>
+  <textarea id="note" placeholder="Write your thoughts here..."></textarea>
+</div>
     </div>
 
     <div class="reviews">
@@ -65,5 +71,7 @@
       <p class="copyright">© 2025 BOOKIFY. Empowering Digital Learning.</p>
     </div>
   </footer>
+  <script src="bookdetails.js"></script>
+
 </body>
 </html>

@@ -2,10 +2,11 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-    name: { type: String, trim: true },
+    name: { type: String, required: true },
+    usn: { type: String, required: true, unique: true, trim: true },  // ✅ ADD THIS
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     passwordHash: { type: String, required: true },
-    role: { type: String, enum: ["admin", "student"], default: "student" },
+    role: { type: String, enum: ["admin", "student"], default: "student" }
   },
   { timestamps: true }
 );

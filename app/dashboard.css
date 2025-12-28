@@ -66,6 +66,7 @@ body::before{
     );
   border-right: 1px solid rgba(214,178,94,0.18);
   box-shadow: inset -1px 0 0 rgba(0,0,0,.2);
+  overflow-y: auto;
 }
 .dash-logo {
   width: 150px;  /* adjust width */
@@ -133,7 +134,9 @@ body::before{
   padding-left: 10px;
 }
 .collapse-panel.open{
-  max-height: 400px; /* enough for options + book list */
+  max-height: 70vh; 
+  overflow-y: auto;
+  padding-right: 6px;/* enough for options + book list */
 }
 
 .option-list{
