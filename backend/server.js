@@ -7,21 +7,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// connect DB
+// Routes
+app.use("/api/books", require("./routes/books"));
+app.use("/api/users", require("./routes/users")); // (we will create below)
+
+// DB
 mongoose
-  .connect("mongodb://127.0.0.1:27017/elibrary")
+  .connect("mongodb://127.0.0.1:27017/bookify")
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB error:", err));
 
-// health
-app.get("/", (req, res) => {
-  res.send("📚 Bookify API is running");
-});
-
-// routes
-app.use("/api/books", require("./routes/books"));
+// Health
+app.get("/", (req, res) => res.send("📚 Bookify API is running"));
 
 const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Backend server running at http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Backend running http://localhost:${PORT}`));

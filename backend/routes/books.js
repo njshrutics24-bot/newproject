@@ -1,49 +1,37 @@
 const express = require("express");
-const Book = require("../models/Book");
-
 const router = express.Router();
+const Book = require("../models/Book");
 
 // GET all books
 router.get("/", async (req, res) => {
-  try {
-    const books = await Book.find();
-    res.json(books);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  const books = await Book.find().sort({ createdAt: -1 });
+  res.json(books);
 });
 
 // GET books by genre
 router.get("/genre/:genreName", async (req, res) => {
-  try {
-    const genre = req.params.genreName;
-    const books = await Book.find({ genre });
-    res.json(books); // return full docs (better than only titles)
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  const genre = req.params.genreName;
+  const books = await Book.find({ genre });
+  res.json(books.map(b => b.title));
 });
 
-// GET books by department (only if your schema actually has department)
+// GET books by department
 router.get("/department/:deptCode", async (req, res) => {
-  try {
-    const dept = req.params.deptCode;
-    const books = await Book.find({ department: dept });
-    res.json(books);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  const dept = req.params.deptCode;
+  const books = await Book.find({ department: dept });
+  res.json(books.map(b => b.title));
 });
 
-// GET single book by id
-router.get("/:id", async (req, res) => {
-  try {
-    const book = await Book.findById(req.params.id);
-    if (!book) return res.status(404).json({ error: "Book not found" });
-    res.json(book);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+// Search by title
+router.get("/search", async (req, res) => {
+  const q = (req.query.q || "").trim();
+  if (!q) return res.json([]);
+
+  const books = await Book.find({
+    title: { $regex: q, $options: "i" },
+  }).limit(20);
+
+  res.json(books.map(b => b.title));
 });
 
 module.exports = router;

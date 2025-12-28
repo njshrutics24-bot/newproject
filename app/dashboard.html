@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,7 +7,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bookify — Student Dashboard</title>
 
-  <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="dashboard.css" />
 </head>
@@ -24,44 +24,42 @@
       <nav class="menu">
 
         <!-- Department Dropdown -->
-        <button class="menu-item collapsible" data-target="#deptPanel">
+        <button class="menu-item collapsible" data-target="#deptPanel" type="button">
           <span>Department</span><span class="caret">▸</span>
         </button>
+
         <div id="deptPanel" class="collapse-panel">
           <div class="option-list">
-            <button class="opt" data-dept="CSE">CSE</button>
-            <button class="opt" data-dept="AIML">AIML</button>
-            <button class="opt" data-dept="ISE">ISE</button>
-            <button class="opt" data-dept="ECE">ECE</button>
-            <button class="opt" data-dept="EEE">EEE</button>
-            <button class="opt" data-dept="ME">ME</button>
-            <button class="opt" data-dept="CE">CE</button>
+            <button class="opt" data-dept="CSE" type="button">CSE</button>
+            <button class="opt" data-dept="AIML" type="button">AIML</button>
+            <button class="opt" data-dept="ISE" type="button">ISE</button>
+            <button class="opt" data-dept="ECE" type="button">ECE</button>
+            <button class="opt" data-dept="EEE" type="button">EEE</button>
+            <button class="opt" data-dept="ME" type="button">ME</button>
+            <button class="opt" data-dept="CE" type="button">CE</button>
           </div>
           <ul id="deptBooks" class="book-list"></ul>
-          <small class="hint" style="display:block; padding: 8px 4px;">
-            Note: Department filter works only if your MongoDB books have a <b>department</b> field.
-          </small>
         </div>
 
         <span class="divider"></span>
 
         <!-- Genre Dropdown -->
-        <button class="menu-item collapsible" data-target="#genrePanel">
+        <button class="menu-item collapsible" data-target="#genrePanel" type="button">
           <span>Genre</span><span class="caret">▸</span>
         </button>
+
         <div id="genrePanel" class="collapse-panel">
           <div class="option-list">
-            <!-- Updated to match your MongoDB genres -->
-            <button class="opt" data-genre="Fiction">Fiction</button>
-            <button class="opt" data-genre="Autobiography">Autobiography</button>
-            <button class="opt" data-genre="Fantasy">Fantasy</button>
-            <button class="opt" data-genre="Self-help">Self-help</button>
-            <button class="opt" data-genre="Finance">Finance</button>
-            <button class="opt" data-genre="Romance">Romance</button>
-            <button class="opt" data-genre="Spiritual">Spiritual</button>
-            <button class="opt" data-genre="Biography">Biography</button>
-            <button class="opt" data-genre="Philosophy">Philosophy</button>
-            <button class="opt" data-genre="Adventure">Adventure</button>
+            <button class="opt" data-genre="Fiction" type="button">Fiction</button>
+            <button class="opt" data-genre="Autobiography" type="button">Autobiography</button>
+            <button class="opt" data-genre="Fantasy" type="button">Fantasy</button>
+            <button class="opt" data-genre="Self-help" type="button">Self-help</button>
+            <button class="opt" data-genre="Finance" type="button">Finance</button>
+            <button class="opt" data-genre="Romance" type="button">Romance</button>
+            <button class="opt" data-genre="Spiritual" type="button">Spiritual</button>
+            <button class="opt" data-genre="Biography" type="button">Biography</button>
+            <button class="opt" data-genre="Philosophy" type="button">Philosophy</button>
+            <button class="opt" data-genre="Adventure" type="button">Adventure</button>
           </div>
           <ul id="genreBooks" class="book-list"></ul>
         </div>
@@ -77,13 +75,11 @@
     <!-- Main Content -->
     <main class="main">
 
-      <!-- Welcome Section -->
       <section class="panel welcome">
         <h1 class="quote-top">WELCOME TO BOOKIFY</h1>
         <h2 class="quote-sub">YOUR GATEWAY TO LEARNING</h2>
       </section>
 
-      <!-- Search Section -->
       <section class="panel search">
         <div class="search-row">
           <input id="searchInput" type="text" placeholder="Search book names…" />
@@ -92,7 +88,6 @@
         <small class="hint">Tip: Search titles only</small>
       </section>
 
-      <!-- Announcements Section (View Only) -->
       <section class="panel announcements">
         <div class="panel-header">
           <h2>📢 Announcements</h2>
@@ -103,7 +98,6 @@
         </ul>
       </section>
 
-      <!-- Footer -->
       <footer class="site-footer">
         © <span id="year"></span> BOOKIFY • Inspiring Lifelong Learning
       </footer>
@@ -112,19 +106,20 @@
   </div>
 
   <script>
-    // ========= CONFIG =========
-    const API_BASE = "http://localhost:5000/api";
-
     // Dynamic year
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Collapsible panels
+    // Backend base URL
+    const API_BASE = "http://localhost:5000";
+
+    // Collapsible
     document.querySelectorAll('.collapsible').forEach(btn => {
       btn.addEventListener('click', () => {
         const targetSel = btn.getAttribute('data-target');
         const panel = document.querySelector(targetSel);
         const caret = btn.querySelector('.caret');
         if (!panel) return;
+
         const isOpen = panel.classList.contains('open');
         panel.classList.toggle('open', !isOpen);
         caret.textContent = !isOpen ? '▾' : '▸';
@@ -135,15 +130,16 @@
     const deptBooksEl = document.getElementById('deptBooks');
     const genreBooksEl = document.getElementById('genreBooks');
 
-    // Cache for search
-    let ALL_BOOKS_CACHE = [];
-
-    function showLoading(ulEl) {
-      ulEl.innerHTML = '<li class="book-empty">Loading books...</li>';
-    }
-
-    function renderList(ulEl, items) {
+    function renderList(ulEl, items, { loading = false } = {}) {
       ulEl.innerHTML = "";
+
+      if (loading) {
+        const li = document.createElement('li');
+        li.className = 'book-empty';
+        li.textContent = "Loading books...";
+        ulEl.appendChild(li);
+        return;
+      }
 
       if (!items || !items.length) {
         const li = document.createElement('li');
@@ -157,94 +153,112 @@
         const li = document.createElement('li');
         li.className = 'book-item';
         const a = document.createElement('a');
-        a.href = "#"; // you can later redirect to book details page
+        a.href = "#";
         a.textContent = title;
         li.appendChild(a);
         ulEl.appendChild(li);
       });
     }
 
-    async function loadAllBooks() {
+    // Robust fetch helper (timeout + JSON + error handling)
+    async function fetchJSON(url, timeoutMs = 8000) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+
       try {
-        const res = await fetch(`${API_BASE}/books`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        ALL_BOOKS_CACHE = await res.json(); // full book objects
-      } catch (err) {
-        console.error("Failed to load all books:", err);
-        ALL_BOOKS_CACHE = [];
+        const res = await fetch(url, {
+          method: "GET",
+          mode: "cors",
+          cache: "no-store",
+          signal: controller.signal
+        });
+
+        if (!res.ok) {
+          const text = await res.text().catch(() => "");
+          throw new Error(`HTTP ${res.status} ${res.statusText} - ${text}`);
+        }
+
+        return await res.json();
+      } finally {
+        clearTimeout(timer);
       }
     }
 
-    // Load once when page opens (for Search)
-    loadAllBooks();
+    function showBackendAlert() {
+      alert("Backend not reachable. Make sure backend is running on http://localhost:5000");
+    }
 
-    // ========= Department Selection (API) =========
+    // ✅ Department selection (UPDATED FETCH CALL)
     document.querySelectorAll('#deptPanel .opt').forEach(btn => {
       btn.addEventListener('click', async () => {
         const dept = btn.getAttribute('data-dept');
-        showLoading(deptBooksEl);
+        renderList(deptBooksEl, [], { loading: true });
+
+        const url = `${API_BASE}/api/books/department/${encodeURIComponent(dept)}`;
 
         try {
-          const res = await fetch(`${API_BASE}/books/department/${encodeURIComponent(dept)}`);
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-          const data = await res.json();
-
-          // Your backend may return ["title1", "title2"] OR full docs.
-          const titles = Array.isArray(data)
-            ? data.map(x => (typeof x === "string" ? x : x.title)).filter(Boolean)
-            : [];
-
+          const titles = await fetchJSON(url);
           renderList(deptBooksEl, titles);
         } catch (err) {
-          console.error(err);
+          console.error("Dept fetch failed:", err);
           renderList(deptBooksEl, []);
+          showBackendAlert();
         }
       });
     });
 
-    // ========= Genre Selection (API) =========
+    // ✅ Genre selection (UPDATED FETCH CALL)
     document.querySelectorAll('#genrePanel .opt').forEach(btn => {
       btn.addEventListener('click', async () => {
         const genre = btn.getAttribute('data-genre');
-        showLoading(genreBooksEl);
+        renderList(genreBooksEl, [], { loading: true });
+
+        const url = `${API_BASE}/api/books/genre/${encodeURIComponent(genre)}`;
 
         try {
-          const res = await fetch(`${API_BASE}/books/genre/${encodeURIComponent(genre)}`);
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-          const data = await res.json();
-
-          // Your backend currently returns titles for genre endpoint.
-          const titles = Array.isArray(data)
-            ? data.map(x => (typeof x === "string" ? x : x.title)).filter(Boolean)
-            : [];
-
+          const titles = await fetchJSON(url);
           renderList(genreBooksEl, titles);
         } catch (err) {
-          console.error(err);
+          console.error("Genre fetch failed:", err);
           renderList(genreBooksEl, []);
+          showBackendAlert();
         }
       });
     });
 
-    // ========= Search Functionality (API-backed) =========
+    // ✅ Search (UPDATED to handle backend returning books or titles)
     document.getElementById('searchBtn').addEventListener('click', async () => {
       const q = document.getElementById('searchInput').value.trim().toLowerCase();
       if (!q) return alert("Type a book title to search.");
 
-      // Ensure cache is loaded
-      if (!ALL_BOOKS_CACHE.length) await loadAllBooks();
+      const url = `${API_BASE}/api/books`;
 
-      const matches = ALL_BOOKS_CACHE
-        .filter(b => (b.title || "").toLowerCase().includes(q))
-        .map(b => `${b.title} — ${b.author} (₹${b.price})`);
+      try {
+        const data = await fetchJSON(url);
 
-      if (!matches.length) return alert(`No matches for "${q}".`);
-      alert(`Matches:\n- ${matches.join("\n- ")}`);
+        // backend might return:
+        // 1) ["title1", "title2"]
+        // 2) [{title:"..."}, {title:"..."}]
+        let titles = [];
+        if (Array.isArray(data)) {
+          if (data.length && typeof data[0] === "string") {
+            titles = data;
+          } else {
+            titles = data.map(b => b && b.title).filter(Boolean);
+          }
+        }
+
+        const matches = titles.filter(t => t.toLowerCase().includes(q));
+
+        if (!matches.length) return alert(`No matches for "${q}".`);
+        alert(`Matches:\n- ${matches.join("\n- ")}`);
+      } catch (err) {
+        console.error("Search fetch failed:", err);
+        showBackendAlert();
+      }
     });
 
-    // ========= Logout =========
+    // Logout
     document.getElementById('logoutBtn').addEventListener('click', (e) => {
       e.preventDefault();
       const confirmed = confirm("Are you sure you want to logout?");
@@ -253,4 +267,5 @@
   </script>
 
 </body>
+
 </html>
