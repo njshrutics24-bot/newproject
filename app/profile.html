@@ -18,10 +18,9 @@
 
     <div class="profile-box">
       <h1>👤 Student Profile</h1>
-      <p><strong>Name:</strong> <span id="profileName"></span></p>
-<p><strong>USN:</strong> <span id="profileUsn"></span></p>
-<p><strong>Email:</strong> <span id="profileEmail"></span></p>
-
+      <p><strong>Name:</strong> Rishitha</p>
+      <p><strong>USN:</strong> 1BM21CS001</p>
+      <p><strong>Email:</strong> rishitha@example.com</p>
     </div>
 
     <div class="cards">
@@ -52,18 +51,5 @@
     </div>
     <p>© 2025 BOOKIFY. All rights reserved.</p>
   </footer>
-  <script>
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  if (!user) {
-    alert("Please login first");
-    window.location.href = "login.html";
-  } else {
-    document.getElementById("profileName").innerText = user.name;
-    document.getElementById("profileUsn").innerText = user.usn;
-    document.getElementById("profileEmail").innerText = user.email;
-  }
-</script>
-
 </body>
 </html>
