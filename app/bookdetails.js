@@ -1,66 +1,104 @@
 const API_BASE = "http://localhost:5000";
 
-function getBookId() {
+document.addEventListener("DOMContentLoaded", () => {
+  loadBookDetails();
+  wireWishlistButton();
+});
+
+function getBookIdFromUrl() {
   const params = new URLSearchParams(window.location.search);
   return params.get("id");
 }
 
-function mustGet(id) {
+async function fetchJSON(url, options = {}, timeoutMs = 8000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+    return data;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function setText(id, value) {
   const el = document.getElementById(id);
-  if (!el) console.error(`Missing element with id="${id}" in bookdetails.html`);
-  return el;
+  if (el) el.textContent = value ?? "—";
+}
+
+function setImg(id, url) {
+  const el = document.getElementById(id);
+  if (el) el.src = url;
 }
 
 async function loadBookDetails() {
-  const id = getBookId();
-  console.log("BookDetails: URL id =", id);
-
-  if (!id) {
-    alert("Book ID missing. Open from dashboard by clicking a book.");
+  const bookId = getBookIdFromUrl();
+  if (!bookId) {
+    alert("Missing book id in URL.");
     return;
   }
 
-  const url = `${API_BASE}/api/books/${encodeURIComponent(id)}`;
-  console.log("BookDetails: fetching", url);
+  try {
+    // IMPORTANT: backend must support GET /api/books/:id
+    const book = await fetchJSON(`${API_BASE}/api/books/${encodeURIComponent(bookId)}`);
 
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    console.error("BookDetails: fetch failed", res.status, text);
-    alert("Failed to load book details. Check console (F12).");
-    return;
+    setText("bookTitle", `📘 ${book.title || "Untitled"}`);
+    setText("bookAuthor", book.author);
+    setText("bookGenre", book.genre);
+    setText("bookDepartment", book.department);
+    setText("bookLanguage", book.language);
+    setText("bookPages", book.pages);
+    setText("bookPrice", book.price);
+
+    // If you don't store images in DB, keep fallback images
+    // You can add these fields later in MongoDB: frontCoverUrl, backCoverUrl
+    if (book.frontCoverUrl) setImg("frontCover", book.frontCoverUrl);
+    else setImg("frontCover", "https://via.placeholder.com/250x350?text=Front+Cover");
+
+    if (book.backCoverUrl) setImg("backCover", book.backCoverUrl);
+    else setImg("backCover", "https://via.placeholder.com/250x350?text=Back+Cover");
+
+    // store globally for wishlist button
+    window.__BOOK_ID__ = book._id;
+  } catch (err) {
+    console.error("Book details load failed:", err);
+    alert("Failed to load book details. Check backend route GET /api/books/:id");
   }
-
-  const book = await res.json();
-  console.log("BookDetails: book =", book);
-
-  // Fill fields
-  const titleEl = mustGet("bookTitle");
-  const authorEl = mustGet("bookAuthor");
-  const genreEl = mustGet("bookGenre");
-  const deptEl = mustGet("bookDepartment");
-  const langEl = mustGet("bookLanguage");
-  const pagesEl = mustGet("bookPages");
-  const priceEl = mustGet("bookPrice");
-  const frontCoverEl = mustGet("frontCover");
-  const backCoverEl = mustGet("backCover");
-
-  if (titleEl) titleEl.textContent = `📘 ${book.title || "Untitled"}`;
-  if (authorEl) authorEl.textContent = book.author || "—";
-  if (genreEl) genreEl.textContent = book.genre || "—";
-  if (deptEl) deptEl.textContent = book.department || "—";
-  if (langEl) langEl.textContent = book.language || "—";
-  if (pagesEl) pagesEl.textContent = String(book.pages ?? "—");
-  if (priceEl) priceEl.textContent = String(book.price ?? "—");
-
-  // Covers (only if you have these fields in DB; otherwise fallback)
-  if (frontCoverEl) frontCoverEl.src = book.coverFront || "https://via.placeholder.com/260x360?text=Cover";
-  if (backCoverEl) backCoverEl.src = book.coverBack || "https://via.placeholder.com/260x360?text=Back+Cover";
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  loadBookDetails().catch((e) => {
-    console.error("BookDetails: unexpected error", e);
-    alert("Unexpected error loading book details. Check console (F12).");
+function wireWishlistButton() {
+  const btn = document.getElementById("addWishlistBtn");
+  if (!btn) return;
+
+  btn.addEventListener("click", async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Please login first.");
+      window.location.href = "index.html";
+      return;
+    }
+
+    const bookId = window.__BOOK_ID__ || getBookIdFromUrl();
+    if (!bookId) return alert("Missing book id.");
+
+    try {
+      const data = await fetchJSON(`${API_BASE}/api/wishlist`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ bookId }),
+      });
+
+      alert(data.message || "Added to wishlist!");
+    } catch (err) {
+      console.error("Add wishlist failed:", err);
+      alert(err.message || "Failed to add to wishlist");
+    }
   });
-});
+}

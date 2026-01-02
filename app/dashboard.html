@@ -230,27 +230,31 @@
 
     // Search (fetch all books, filter by title, show list with links)
     document.getElementById('searchBtn').addEventListener('click', async () => {
-      const q = document.getElementById('searchInput').value.trim().toLowerCase();
-      if (!q) return alert("Type a book title to search.");
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  if (!q) return alert("Type a book title to search.");
 
-      const url = `${API_BASE}/api/books`;
+  try {
+    const data = await fetchJSON(`${API_BASE}/api/books`);
 
-      try {
-        const books = await fetchJSON(url);
-        if (!Array.isArray(books)) return alert("Unexpected response from backend.");
+    // data is full book objects, because /api/books returns books
+    const matches = data.filter(b => (b.title || "").toLowerCase().includes(q));
 
-        const matches = books.filter(b => (b.title || "").toLowerCase().includes(q));
+    if (!matches.length) {
+      alert(`No matches for "${q}".`);
+      return;
+    }
 
-        if (!matches.length) return alert(`No matches for "${q}".`);
+    // If more than 1 match, open first one (or you can show a list)
+    const first = matches[0];
 
-        // Simple popup list with titles; you can enhance later
-        // If you want clickable results, we can render into a modal/panel.
-        alert(`Matches:\n- ${matches.map(m => m.title).join("\n- ")}`);
-      } catch (err) {
-        console.error("Search fetch failed:", err);
-        showBackendAlert();
-      }
-    });
+    // ✅ redirect to bookdetails page with id
+    window.location.href = `bookdetails.html?id=${encodeURIComponent(first._id)}`;
+
+  } catch (err) {
+    console.error("Search failed:", err);
+    showBackendAlert();
+  }
+});
 
     // Logout
     document.getElementById('logoutBtn').addEventListener('click', (e) => {

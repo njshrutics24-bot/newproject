@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
+
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -66,17 +67,31 @@ router.post("/register", async (req, res) => {
 // ----------------------
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    console.log("LOGIN HIT", req.body);
 
+    const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ error: "Email & password required" });
     }
 
-    const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ error: "Invalid credentials" });
+    const user = await User.findOne({ email }); // ✅ user declared FIRST
+    console.log("USER FOUND?", !!user);
+
+    if (!user || !user.passwordHash) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
 
     const ok = await bcrypt.compare(password, user.passwordHash);
-    if (!ok) return res.status(401).json({ error: "Invalid credentials" });
+    console.log("PASSWORD MATCH?", ok);
+
+    if (!ok) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const JWT_SECRET = process.env.JWT_SECRET;
+    if (!JWT_SECRET) {
+      throw new Error("JWT_SECRET missing in .env");
+    }
 
     const token = jwt.sign(
       { userId: user._id, role: user.role },
@@ -84,7 +99,6 @@ router.post("/login", async (req, res) => {
       { expiresIn: "2h" }
     );
 
-    // Return user details for frontend/profile
     return res.json({
       token,
       userId: user._id,
@@ -93,8 +107,8 @@ router.post("/login", async (req, res) => {
       usn: user.usn,
       email: user.email
     });
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
+    console.error("LOGIN ERROR:", err);
     return res.status(500).json({ error: "Server error" });
   }
 });

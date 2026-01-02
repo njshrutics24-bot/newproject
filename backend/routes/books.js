@@ -10,22 +10,19 @@ router.get("/", async (req, res) => {
 
 // GET books by department
 router.get("/department/:deptCode", async (req, res) => {
-  const dept = (req.params.deptCode || "").trim().toUpperCase();
-  const books = await Book.find({ department: dept }).sort({ createdAt: -1 });
-  res.json(books);
+  const dept = req.params.deptCode;
+  const books = await Book.find({ department: dept });
+  res.json(books); // ✅ return full objects (includes _id)
 });
 
 
 // GET books by genre (across ALL departments)
 router.get("/genre/:genreName", async (req, res) => {
-  const genre = (req.params.genreName || "").trim();
-
-  const books = await Book.find({
-    genre: { $regex: `^${genre}$`, $options: "i" }
-  }).sort({ createdAt: -1 });
-
+  const genre = req.params.genreName;
+  const books = await Book.find({ genre });
   res.json(books);
 });
+
 
 // Search by title
 router.get("/search", async (req, res) => {
@@ -39,6 +36,16 @@ res.json(books);
 
 
 });
+router.get("/:id", async (req, res) => {
+  try {
+    const book = await Book.findById(req.params.id);
+    if (!book) return res.status(404).json({ error: "Book not found" });
+    res.json(book);
+  } catch {
+    res.status(400).json({ error: "Invalid book id" });
+  }
+});
+
 
 module.exports = router;
 router.get("/", async (req, res) => {
@@ -55,3 +62,4 @@ router.get("/:id", async (req, res) => {
     res.status(400).json({ error: "Invalid book id" });
   }
 });
+// GET single book by id (for bookdetails page)

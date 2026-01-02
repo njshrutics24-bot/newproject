@@ -121,30 +121,8 @@
     </div>
   </section>
 
-  <script>
-  const addButtons = document.querySelectorAll(".add-btn");
+<div id="recGrid"></div>
+<script src="recommended.js"></script>
 
-  addButtons.forEach(button => {
-    button.addEventListener("click", () => {
-      const card = button.closest(".book-card");
-      const book = {
-        title: card.dataset.title,
-        author: card.dataset.author,
-        image: card.dataset.image
-      };
-
-      let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-
-      // Add only if not already added
-      if (!wishlist.some(item => item.title === book.title)) {
-        wishlist.push(book);
-        localStorage.setItem("wishlist", JSON.stringify(wishlist));
-      }
-
-      // 👉 Immediately redirect to wishlist page
-      window.location.href = "wishlist.html";
-    });
-  });
-</script>
 </body>
 </html>

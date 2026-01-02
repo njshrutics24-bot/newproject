@@ -93,35 +93,8 @@
   <p class="quote">"So many books, so little time." — Frank Zappa</p>
 
   <section class="wishlist-container" id="wishlist"></section>
-
-  <script>
-    function loadWishlist() {
-      const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-      const container = document.getElementById("wishlist");
-
-      container.innerHTML = "";
-
-      wishlist.forEach((book, index) => {
-        container.innerHTML += `
-          <div class="book-card">
-            <img src="${book.image}" class="book-cover">
-            <div class="book-title">${book.title}</div>
-            <div class="book-author">by ${book.author}</div>
-            <button class="remove-btn" onclick="removeItem(${index})">Remove</button>
-          </div>
-        `;
-      });
-    }
-
-    function removeItem(index) {
-      let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-      wishlist.splice(index, 1);
-      localStorage.setItem("wishlist", JSON.stringify(wishlist));
-      loadWishlist();
-    }
-
-    loadWishlist();
-  </script>
-
+  <div id="wishlistList"></div>
+  <script src="wishlist.js"></script>
+  
 </body>
 </html>

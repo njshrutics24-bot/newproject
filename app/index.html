@@ -76,43 +76,51 @@
     toggle.classList.toggle('active', isPwd);
   });
 
-  // LOGIN AUTH + REDIRECT
-  document.getElementById('loginForm').addEventListener('submit', (e) => {
+  // 🔐 LOGIN USING BACKEND
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const role = document.getElementById('role').value;
     const email = document.getElementById('email').value.trim();
-    const pass = document.getElementById('password').value.trim();
+    const password = document.getElementById('password').value.trim();
 
-    // Student credentials
-    const VALID_EMAIL = "student@bookify.com";
-    const VALID_PASS = "12345";
-
-    // Admin credentials
-    const ADMIN_EMAIL = "admin@bookify.com";
-    const ADMIN_PASS = "admin123";
-
-    if (!email || !pass) {
+    if (!email || !password) {
       alert("Please fill in all fields.");
       return;
     }
 
-    // LOGIN REDIRECTION BASED ON ROLE
-    if (role === "student") {
-        if (email === VALID_EMAIL && pass === VALID_PASS) {
-            alert("Login successful!");
-            window.location.href = "dashboard.html";
-        } else {
-            alert("Incorrect student email or password.");
-        }
-    } 
-    else if (role === "admin") {
-        if (email === ADMIN_EMAIL && pass === ADMIN_PASS) {
-            alert("Admin login successful!");
-            window.location.href = "admindashboard.html";
-        } else {
-            alert("Incorrect admin email or password.");
-        }
+    try {
+      const res = await fetch("http://localhost:5000/api/users/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Login failed");
+        return;
+      }
+
+      // ✅ STORE TOKEN (THIS WAS MISSING)
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userId", data.userId);
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("name", data.name);
+      localStorage.setItem("usn", data.usn);
+
+      alert("Login successful!");
+
+      // Redirect based on role from backend
+      if (data.role === "admin") {
+        window.location.href = "admindashboard.html";
+      } else {
+        window.location.href = "dashboard.html";
+      }
+
+    } catch (err) {
+      console.error(err);
+      alert("Unable to login. Backend not reachable.");
     }
   });
 </script>
