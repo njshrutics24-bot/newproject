@@ -1,0 +1,23 @@
+#recGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.rec-card {
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.25);
+}
+
+.rec-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.btn[disabled] {
+  opacity: .6;
+  cursor: not-allowed;
+}

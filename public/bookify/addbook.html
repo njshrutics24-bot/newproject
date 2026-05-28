@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel | Bookify</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #0e0e0e;
+      color: white;
+    }
+
+    header {
+      text-align: center;
+      padding: 20px 0;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #ffd700;
+      letter-spacing: 2px;
+      box-shadow: 0 2px 10px rgba(255, 215, 0, 0.2);
+    }
+
+    .admin-container {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 30px;
+      padding: 30px;
+      height: calc(100vh - 120px);
+    }
+
+    .add-book-section {
+      background-color: #1e1e1e;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+      position: sticky;
+      top: 20px;
+      height: fit-content;
+    }
+
+    .add-book-section h2 {
+      text-align: center;
+      color: #ffd700;
+      margin-bottom: 15px;
+    }
+
+    .add-book-section form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .add-book-section input,
+    .add-book-section textarea {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      background-color: #2a2a2a;
+      color: white;
+      resize: none;
+    }
+
+    .add-book-section button {
+      background-color: #ffd700;
+      color: black;
+      font-weight: 600;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .add-book-section button:hover {
+      background-color: #e5c100;
+    }
+
+    .current-books-section {
+      background-color: #121212;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+      overflow-y: auto;
+      max-height: 80vh;
+    }
+
+    .current-books-section h2 {
+      color: #ffd700;
+      margin-bottom: 10px;
+    }
+
+    .search-bar {
+      margin-bottom: 15px;
+    }
+
+    .search-bar input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      background-color: #2a2a2a;
+      color: white;
+    }
+
+    .books-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 15px;
+    }
+
+    .book-card {
+      background-color: #222;
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      position: relative;
+      transition: transform 0.2s ease;
+      cursor: pointer;
+    }
+
+    .book-card:hover {
+      transform: scale(1.03);
+    }
+
+    .book-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .book-card h4 {
+      margin: 10px 0 5px;
+      color: #ffd700;
+      font-size: 1rem;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: crimson;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      z-index: 2;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .modal-content {
+      background-color: #1e1e1e;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+      width: 400px;
+      text-align: center;
+      position: relative;
+      animation: pop 0.3s ease;
+    }
+
+    @keyframes pop {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-content img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .modal-content h3 {
+      color: #ffd700;
+      margin-bottom: 8px;
+    }
+
+    .modal-content p {
+      color: #ccc;
+      margin: 5px 0;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #ffd700;
+      cursor: pointer;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #ffd700;
+      letter-spacing: 3px;
+      background-color: #1a1a1a;
+      box-shadow: 0 -2px 10px rgba(255, 215, 0, 0.2);
+    }
+  </style>
+</head>
+
+<body>
+  <header>📚 Bookify Admin Panel</header>
+
+  <div class="admin-container">
+
+    <!-- Add Book Section -->
+    <div class="add-book-section">
+      <h2>Add a New Book</h2>
+      <form id="addBookForm">
+        <input type="text" id="bookTitle" placeholder="Book Title" required>
+        <input type="text" id="bookAuthor" placeholder="Author" required>
+        <input type="text" id="bookImage" placeholder="Image URL (optional)">
+        <textarea id="bookDesc" placeholder="Book Description (optional)" rows="4"></textarea>
+        <button type="submit">Add Book</button>
+      </form>
+    </div>
+
+    <!-- Current Books Section -->
+    <div class="current-books-section">
+      <h2>Current Books</h2>
+
+      <div class="search-bar">
+        <input type="text" id="searchBar" placeholder="Search books...">
+      </div>
+
+      <div id="booksList" class="books-list"></div>
+    </div>
+  </div>
+
+  <footer>BOOKIFY</footer>
+
+  <!-- Modal -->
+  <div id="bookModal" class="modal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal()">×</button>
+      <img id="modalImg" src="" alt="">
+      <h3 id="modalTitle"></h3>
+      <p id="modalAuthor"></p>
+      <p id="modalDesc"></p>
+    </div>
+  </div>
+
+  <script>
+    const addBookForm = document.getElementById("addBookForm");
+    const booksList = document.getElementById("booksList");
+    const searchBar = document.getElementById("searchBar");
+
+    const modal = document.getElementById("bookModal");
+    const modalImg = document.getElementById("modalImg");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalAuthor = document.getElementById("modalAuthor");
+    const modalDesc = document.getElementById("modalDesc");
+
+    let books = JSON.parse(localStorage.getItem("books")) || [];
+
+    displayBooks(books);
+
+    addBookForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      
+      const title = document.getElementById("bookTitle").value;
+      const author = document.getElementById("bookAuthor").value;
+
+      const imageInput = document.getElementById("bookImage").value.trim();
+      const descInput = document.getElementById("bookDesc").value.trim();
+
+      const image = imageInput === "" ? "https://via.placeholder.com/200x300?text=No+Image" : imageInput;
+      const description = descInput === "" ? "No description available." : descInput;
+
+      const book = { title, author, image, description };
+      books.push(book);
+      localStorage.setItem("books", JSON.stringify(books));
+      displayBooks(books);
+      addBookForm.reset();
+    });
+
+    function displayBooks(list) {
+      booksList.innerHTML = "";
+      list.forEach((book, index) => {
+        const div = document.createElement("div");
+        div.classList.add("book-card");
+        div.innerHTML = `
+          <button class="remove-btn" onclick="removeBook(${index}); event.stopPropagation();">X</button>
+          <img src="${book.image}" alt="${book.title}">
+          <h4>${book.title}</h4>
+        `;
+        div.addEventListener("click", () => openModal(book));
+        booksList.appendChild(div);
+      });
+    }
+
+    function openModal(book) {
+      modal.style.display = "flex";
+      modalImg.src = book.image;
+      modalTitle.textContent = book.title;
+      modalAuthor.textContent = "By " + book.author;
+      modalDesc.textContent = book.description;
+    }
+
+    function closeModal() {
+      modal.style.display = "none";
+    }
+
+    function removeBook(index) {
+      books.splice(index, 1);
+      localStorage.setItem("books", JSON.stringify(books));
+      displayBooks(books);
+    }
+
+    searchBar.addEventListener("input", (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      const filtered = books.filter(
+        (b) =>
+          b.title.toLowerCase().includes(searchTerm) ||
+          b.author.toLowerCase().includes(searchTerm) ||
+          b.description.toLowerCase().includes(searchTerm)
+      );
+      displayBooks(filtered);
+    });
+
+    window.onclick = (e) => {
+      if (e.target === modal) closeModal();
+    };
+  </script>
+</body>
+</html>
