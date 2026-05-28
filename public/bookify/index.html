@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bookify – Login</title>
+
+  <!-- Google Font: Modern Rounded -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="wrapper">
+    <!-- Brand (no logo) -->
+    <header class="brand" aria-label="Bookify">
+  <img src="images/bookify-logo.png" alt="Bookify Logo" class="logo-img">
+  <p class="subtitle">“A library is not a luxury, but one of the necessities of life.” — Henry Ward Beecher</p>
+</header>
+
+
+    <!-- Login Card -->
+    <section class="card" aria-label="Login form">
+      <form id="loginForm" novalidate>
+        <div class="field">
+          <label for="role">Login as</label>
+          <div class="select-wrap">
+            <select id="role" name="role" aria-label="Select role">
+              <option value="student" selected>Student</option>
+              <option value="admin">Admin</option>
+            </select>
+            <span class="select-caret" aria-hidden="true">▾</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" placeholder="name@example.com" required />
+          <small class="hint">Use your registered email</small>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="password-wrap">
+            <input id="password" name="password" type="password" placeholder="••••••••" required />
+            <button type="button" class="icon-btn" id="togglePwd" aria-label="Show or hide password" title="Show/Hide password">
+              <!-- eye icon -->
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                <path d="M12 5C7 5 2.73 8.11 1 12c1.73 3.89 6 7 11 7s9.27-3.11 11-7c-1.73-3.89-6-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="row between">
+            <a class="link" href="#" aria-label="Forgot password">Forgot password?</a>
+          </div>
+        </div>
+
+        <button class="btn primary" type="submit">Sign In</button>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© <span id="year"></span> Bookify • Empowering Digital Learning</p>
+  </footer>
+
+  <script>
+  // Dynamic year
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Show/Hide password
+  const toggle = document.getElementById('togglePwd');
+  const pwd = document.getElementById('password');
+  toggle.addEventListener('click', () => {
+    const isPwd = pwd.getAttribute('type') === 'password';
+    pwd.setAttribute('type', isPwd ? 'text' : 'password');
+    toggle.classList.toggle('active', isPwd);
+  });
+
+  // 🔐 LOGIN USING BACKEND
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    if (!email || !password) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:5000/api/users/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Login failed");
+        return;
+      }
+
+      // ✅ STORE TOKEN (THIS WAS MISSING)
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userId", data.userId);
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("name", data.name);
+      localStorage.setItem("usn", data.usn);
+
+      alert("Login successful!");
+
+      // Redirect based on role from backend
+      if (data.role === "admin") {
+        window.location.href = "admindashboard.html";
+      } else {
+        window.location.href = "dashboard.html";
+      }
+
+    } catch (err) {
+      console.error(err);
+      alert("Unable to login. Backend not reachable.");
+    }
+  });
+</script>
+
+
+</body>
+</html>

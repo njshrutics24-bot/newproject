@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bookify — Student Dashboard</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+
+<body>
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="images/logo.png" alt="Bookify Logo" class="dash-logo">
+        <div class="brand-text">BOOKIFY</div>
+      </div>
+
+      <nav class="menu">
+
+        <!-- Department Dropdown -->
+        <button class="menu-item collapsible" data-target="#deptPanel" type="button">
+          <span>Department</span><span class="caret">▸</span>
+        </button>
+
+        <div id="deptPanel" class="collapse-panel">
+          <div class="option-list">
+            <button class="opt" data-dept="CSE" type="button">CSE</button>
+            <button class="opt" data-dept="AIML" type="button">AIML</button>
+            <button class="opt" data-dept="ISE" type="button">ISE</button>
+            <button class="opt" data-dept="ECE" type="button">ECE</button>
+            <button class="opt" data-dept="EEE" type="button">EEE</button>
+            <button class="opt" data-dept="ME" type="button">ME</button>
+            <button class="opt" data-dept="CE" type="button">CE</button>
+          </div>
+          <ul id="deptBooks" class="book-list"></ul>
+        </div>
+
+        <span class="divider"></span>
+
+        <!-- Genre Dropdown -->
+        <button class="menu-item collapsible" data-target="#genrePanel" type="button">
+          <span>Genre</span><span class="caret">▸</span>
+        </button>
+
+        <div id="genrePanel" class="collapse-panel">
+          <div class="option-list">
+            <button class="opt" data-genre="Fiction" type="button">Fiction</button>
+            <button class="opt" data-genre="Autobiography" type="button">Autobiography</button>
+            <button class="opt" data-genre="Fantasy" type="button">Fantasy</button>
+            <button class="opt" data-genre="Self-help" type="button">Self-help</button>
+            <button class="opt" data-genre="Finance" type="button">Finance</button>
+            <button class="opt" data-genre="Romance" type="button">Romance</button>
+            <button class="opt" data-genre="Spiritual" type="button">Spiritual</button>
+            <button class="opt" data-genre="Biography" type="button">Biography</button>
+            <button class="opt" data-genre="Philosophy" type="button">Philosophy</button>
+            <button class="opt" data-genre="Adventure" type="button">Adventure</button>
+          </div>
+          <ul id="genreBooks" class="book-list"></ul>
+        </div>
+
+        <span class="divider"></span>
+
+        <a href="profile.html" class="menu-item">Profile</a>
+        <span class="divider"></span>
+        <a href="#" class="menu-item danger" id="logoutBtn">Logout</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+
+      <section class="panel welcome">
+        <h1 class="quote-top">WELCOME TO BOOKIFY</h1>
+        <h2 class="quote-sub">YOUR GATEWAY TO LEARNING</h2>
+      </section>
+
+      <section class="panel search">
+        <div class="search-row">
+          <input id="searchInput" type="text" placeholder="Search book names…" />
+          <button class="btn primary" id="searchBtn" type="button">Search</button>
+        </div>
+        <small class="hint">Tip: Search titles only</small>
+      </section>
+
+      <section class="panel announcements">
+        <div class="panel-header">
+          <h2>📢 Announcements</h2>
+        </div>
+        <ul class="announce-list">
+          <li class="announce"><span class="emoji">📢</span> Library cards will be distributed from tomorrow</li>
+          <li class="announce"><span class="emoji">📢</span> Library will be open on Sundays till 10 PM</li>
+        </ul>
+      </section>
+
+      <footer class="site-footer">
+        © <span id="year"></span> BOOKIFY • Inspiring Lifelong Learning
+      </footer>
+
+    </main>
+  </div>
+
+  <script>
+    // Dynamic year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Backend base URL
+    const API_BASE = "http://localhost:5000";
+
+    // Collapsible behavior
+    document.querySelectorAll('.collapsible').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetSel = btn.getAttribute('data-target');
+        const panel = document.querySelector(targetSel);
+        const caret = btn.querySelector('.caret');
+        if (!panel) return;
+
+        const isOpen = panel.classList.contains('open');
+        panel.classList.toggle('open', !isOpen);
+        caret.textContent = !isOpen ? '▾' : '▸';
+      });
+    });
+
+    // Elements
+    const deptBooksEl = document.getElementById('deptBooks');
+    const genreBooksEl = document.getElementById('genreBooks');
+
+    // Render list of books (expects full book objects from backend)
+    function renderList(ulEl, books, { loading = false } = {}) {
+      ulEl.innerHTML = "";
+
+      if (loading) {
+        const li = document.createElement('li');
+        li.className = 'book-empty';
+        li.textContent = "Loading books...";
+        ulEl.appendChild(li);
+        return;
+      }
+
+      if (!books || !books.length) {
+        const li = document.createElement('li');
+        li.className = 'book-empty';
+        li.textContent = "No books available.";
+        ulEl.appendChild(li);
+        return;
+      }
+
+      books.forEach(book => {
+        const li = document.createElement('li');
+        li.className = 'book-item';
+
+        const a = document.createElement('a');
+        a.href = `bookdetails.html?id=${book._id}`;
+        a.textContent = book.title;
+
+        li.appendChild(a);
+        ulEl.appendChild(li);
+      });
+    }
+
+    // Robust fetch helper (timeout + JSON + error handling)
+    async function fetchJSON(url, timeoutMs = 8000) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+      try {
+        const res = await fetch(url, {
+          method: "GET",
+          mode: "cors",
+          cache: "no-store",
+          signal: controller.signal
+        });
+
+        if (!res.ok) {
+          const text = await res.text().catch(() => "");
+          throw new Error(`HTTP ${res.status} ${res.statusText} - ${text}`);
+        }
+
+        return await res.json();
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    function showBackendAlert() {
+      alert("Backend not reachable. Make sure backend is running on http://localhost:5000");
+    }
+
+    // Department selection (returns books array)
+    document.querySelectorAll('#deptPanel .opt').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const dept = btn.getAttribute('data-dept');
+        renderList(deptBooksEl, [], { loading: true });
+
+        const url = `${API_BASE}/api/books/department/${encodeURIComponent(dept)}`;
+
+        try {
+          const books = await fetchJSON(url);
+          renderList(deptBooksEl, books);
+        } catch (err) {
+          console.error("Dept fetch failed:", err);
+          renderList(deptBooksEl, []);
+          showBackendAlert();
+        }
+      });
+    });
+
+    // Genre selection (returns books array)
+    document.querySelectorAll('#genrePanel .opt').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const genre = btn.getAttribute('data-genre');
+        renderList(genreBooksEl, [], { loading: true });
+
+        const url = `${API_BASE}/api/books/genre/${encodeURIComponent(genre)}`;
+
+        try {
+          const books = await fetchJSON(url);
+          renderList(genreBooksEl, books);
+        } catch (err) {
+          console.error("Genre fetch failed:", err);
+          renderList(genreBooksEl, []);
+          showBackendAlert();
+        }
+      });
+    });
+
+    // Search (fetch all books, filter by title, show list with links)
+    document.getElementById('searchBtn').addEventListener('click', async () => {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  if (!q) return alert("Type a book title to search.");
+
+  try {
+    const data = await fetchJSON(`${API_BASE}/api/books`);
+
+    // data is full book objects, because /api/books returns books
+    const matches = data.filter(b => (b.title || "").toLowerCase().includes(q));
+
+    if (!matches.length) {
+      alert(`No matches for "${q}".`);
+      return;
+    }
+
+    // If more than 1 match, open first one (or you can show a list)
+    const first = matches[0];
+
+    // ✅ redirect to bookdetails page with id
+    window.location.href = `bookdetails.html?id=${encodeURIComponent(first._id)}`;
+
+  } catch (err) {
+    console.error("Search failed:", err);
+    showBackendAlert();
+  }
+});
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      const confirmed = confirm("Are you sure you want to logout?");
+      if (confirmed) window.location.href = "index.html";
+    });
+  </script>
+
+</body>
+
+</html>
